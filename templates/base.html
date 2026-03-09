@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cloud Monitor</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+body{background:#0f172a;color:#e2e8f0;min-height:100vh}
+.navbar{background:#1e293b;padding:14px 30px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #334155;position:sticky;top:0;z-index:100}
+.logo{font-size:20px;font-weight:800;color:#38bdf8;text-decoration:none}
+.logo span{color:#f472b6}
+.nav-links{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.nav-links a{color:#94a3b8;text-decoration:none;padding:7px 13px;border-radius:8px;font-size:14px;transition:all 0.2s}
+.nav-links a:hover{background:#334155;color:#e2e8f0}
+.nav-links a.active{background:#0ea5e9;color:white}
+.nav-links .logout{color:#f87171;border:1px solid #450a0a}
+.nav-links .logout:hover{background:#450a0a}
+.user-pill{background:#1e3a5f;color:#38bdf8;padding:6px 12px;border-radius:20px;font-size:13px;font-weight:600}
+.container{padding:28px 32px;max-width:1500px;margin:0 auto}
+.page-title{font-size:22px;font-weight:700;margin-bottom:24px;color:#f1f5f9}
+.card{background:#1e293b;border-radius:12px;padding:22px;border:1px solid #334155;margin-bottom:20px}
+.card-title{font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:16px}
+.badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;display:inline-block}
+.badge-success{background:#064e3b;color:#34d399}
+.badge-danger{background:#450a0a;color:#f87171}
+.badge-warning{background:#451a03;color:#fb923c}
+.badge-critical{background:#3b0764;color:#c084fc}
+.badge-info{background:#0c4a6e;color:#38bdf8}
+.badge-locked{background:#422006;color:#fb923c}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:11px 14px;background:#0f172a;color:#64748b;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+td{padding:11px 14px;border-bottom:1px solid #243044;font-size:13px;color:#cbd5e1}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#243044}
+.btn{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-size:13px;font-weight:600;text-decoration:none;display:inline-block;transition:all 0.2s}
+.btn-primary{background:#0ea5e9;color:white}
+.btn-primary:hover{background:#0284c7}
+.btn-danger{background:#dc2626;color:white}
+.btn-danger:hover{background:#b91c1c}
+.btn-success{background:#059669;color:white}
+.btn-success:hover{background:#047857}
+.btn-warning{background:#d97706;color:white}
+.btn-warning:hover{background:#b45309}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:24px}
+.stat-card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155}
+.stat-label{color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.stat-value{font-size:34px;font-weight:800;line-height:1}
+.stat-sub{color:#64748b;font-size:12px;margin-top:6px}
+input[type=text],input[type=password],input[type=email],select{
+  background:#0f172a;border:1px solid #334155;border-radius:8px;
+  color:#e2e8f0;font-size:14px;padding:9px 13px;outline:none;
+  transition:border 0.2s;width:100%}
+input:focus,select:focus{border-color:#38bdf8}
+label{display:block;color:#94a3b8;font-size:12px;font-weight:600;margin-bottom:5px;margin-top:14px;text-transform:uppercase;letter-spacing:0.3px}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a class="logo" href="/dashboard">Cloud<span>Monitor</span></a>
+  <div class="nav-links">
+    <a href="/dashboard" {% if request.path=='/dashboard' %}class="active"{% endif %}>Dashboard</a>
+    <a href="/logs"      {% if request.path=='/logs'      %}class="active"{% endif %}>Logs</a>
+    <a href="/alerts"    {% if request.path=='/alerts'    %}class="active"{% endif %}>Alerts</a>
+    <a href="/sessions"  {% if request.path=='/sessions'  %}class="active"{% endif %}>Sessions</a>
+    {% if role == 'admin' %}
+    <a href="/users"     {% if request.path=='/users'     %}class="active"{% endif %}>Users</a>
+    {% endif %}
+    <span class="user-pill">{{ username }} &middot; {{ role }}</span>
+    <a href="/logout" class="logout">Logout</a>
+  </div>
+</nav>
+<div class="container">
+{% block content %}{% endblock %}
+</div>
+</body>
+</html>

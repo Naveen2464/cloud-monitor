@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-title">Security Alerts &mdash; <span style="font-size:13px;color:#64748b;font-weight:400">All alerts stored in SQLite Database</span></div>
+<div class="card">
+  <table>
+    <thead><tr>
+      <th>ID</th><th>Timestamp</th><th>Type</th><th>Severity</th><th>Username</th><th>Message</th>
+    </tr></thead>
+    <tbody>
+    {% for a in alerts %}
+    <tr>
+      <td style="color:#475569">{{ a.id }}</td>
+      <td style="font-family:monospace;color:#64748b;font-size:12px">{{ a.timestamp }}</td>
+      <td style="color:#94a3b8;text-transform:capitalize">{{ a.alert_type.replace('_',' ') }}</td>
+      <td>
+        {% if a.severity=='CRITICAL' %}<span class="badge badge-critical">CRITICAL</span>
+        {% elif a.severity=='ERROR'  %}<span class="badge badge-danger">ERROR</span>
+        {% else %}<span class="badge badge-warning">WARNING</span>{% endif %}
+      </td>
+      <td style="color:#38bdf8;font-weight:600">{{ a.username }}</td>
+      <td style="color:#e2e8f0;font-size:13px">{{ a.message }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" style="text-align:center;padding:50px;color:#64748b">
+      No alerts yet — try entering wrong password 3 times!
+    </td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

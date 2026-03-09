@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-title">Dashboard &mdash; <span style="font-size:13px;color:#64748b;font-weight:400">Auto-refreshes every 10 seconds</span></div>
+
+<div class="stat-grid">
+  <div class="stat-card" style="border-left:4px solid #34d399">
+    <div class="stat-label">Successful Logins</div>
+    <div class="stat-value" style="color:#34d399" id="s-success">{{ stats.total_success }}</div>
+    <div class="stat-sub">Total successful logins</div>
+  </div>
+  <div class="stat-card" style="border-left:4px solid #f87171">
+    <div class="stat-label">Failed Logins</div>
+    <div class="stat-value" style="color:#f87171" id="s-failed">{{ stats.total_failed }}</div>
+    <div class="stat-sub">Authentication failures</div>
+  </div>
+  <div class="stat-card" style="border-left:4px solid #c084fc">
+    <div class="stat-label">Critical Alerts</div>
+    <div class="stat-value" style="color:#c084fc" id="s-critical">{{ stats.total_critical }}</div>
+    <div class="stat-sub">Brute force detected</div>
+  </div>
+  <div class="stat-card" style="border-left:4px solid #38bdf8">
+    <div class="stat-label">Total Users</div>
+    <div class="stat-value" style="color:#38bdf8" id="s-users">{{ stats.total_users }}</div>
+    <div class="stat-sub">Registered accounts</div>
+  </div>
+  <div class="stat-card" style="border-left:4px solid #fb923c">
+    <div class="stat-label">Locked Accounts</div>
+    <div class="stat-value" style="color:#fb923c" id="s-locked">{{ stats.locked_users }}</div>
+    <div class="stat-sub">After brute force</div>
+  </div>
+  <div class="stat-card" style="border-left:4px solid #a3e635">
+    <div class="stat-label">Active Sessions</div>
+    <div class="stat-value" style="color:#a3e635" id="s-sessions">{{ stats.active_sessions }}</div>
+    <div class="stat-sub">Currently logged in</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+  <div class="card">
+    <div class="card-title">Recent Security Alerts</div>
+    <div id="alerts-div">
+    {% for a in alerts %}
+    <div style="padding:10px 12px;background:#0f172a;border-radius:8px;margin-bottom:8px;
+      border-left:3px solid {% if a.severity=='CRITICAL' %}#c084fc{% elif a.severity=='ERROR' %}#f87171{% else %}#fb923c{% endif %}">
+      <div style="font-size:13px;color:#e2e8f0">{{ a.message[:90] }}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:4px">{{ a.timestamp }}
+        &middot; <span style="color:{% if a.severity=='CRITICAL' %}#c084fc{% else %}#f87171{% endif %}">{{ a.severity }}</span>
+      </div>
+    </div>
+    {% else %}
+    <div style="color:#64748b;text-align:center;padding:30px">No alerts yet. Try wrong password 3x to trigger!</div>
+    {% endfor %}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Top Failed Login Attempts</div>
+    {% for u in stats.top_failed %}
+    <div style="display:flex;justify-content:space-between;align-items:center;
+      padding:10px 12px;background:#0f172a;border-radius:8px;margin-bottom:8px">
+      <span style="color:#e2e8f0;font-weight:600">{{ u.username }}</span>
+      <span class="badge badge-danger">{{ u.cnt }} failed</span>
+    </div>
+    {% else %}
+    <div style="color:#64748b;text-align:center;padding:30px">No failures recorded yet</div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Recent Login Activity</div>
+  <div style="overflow-x:auto">
+  <table id="logs-tbl">
+    <thead><tr>
+      <th>Timestamp</th><th>Username</th><th>Status</th><th>IP Address</th><th>Message</th>
+    </tr></thead>
+    <tbody>
+    {% for log in logs %}
+    <tr>
+      <td style="font-family:monospace;color:#64748b;font-size:12px">{{ log.timestamp }}</td>
+      <td><span style="color:#38bdf8;font-weight:600">{{ log.username }}</span></td>
+      <td>
+        {% if log.status=='SUCCESS' %}<span class="badge badge-success">SUCCESS</span>
+        {% elif log.status=='FAILED' %}<span class="badge badge-danger">FAILED</span>
+        {% else %}<span class="badge badge-info">LOGOUT</span>{% endif %}
+      </td>
+      <td style="font-family:monospace;color:#94a3b8">{{ log.ip_address }}</td>
+      <td style="color:#64748b">{{ log.message }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<script>
+setInterval(async () => {
+  try {
+    const [sr, lr, ar] = await Promise.all([
+      fetch('/api/stats'), fetch('/api/logs'), fetch('/api/alerts')
+    ]);
+    const stats  = await sr.json();
+    const logs   = await lr.json();
+    const alerts = await ar.json();
+
+    document.getElementById('s-success').textContent  = stats.total_success;
+    document.getElementById('s-failed').textContent   = stats.total_failed;
+    document.getElementById('s-critical').textContent = stats.total_critical;
+    document.getElementById('s-users').textContent    = stats.total_users;
+    document.getElementById('s-locked').textContent   = stats.locked_users;
+    document.getElementById('s-sessions').textContent = stats.active_sessions;
+
+    document.querySelector('#logs-tbl tbody').innerHTML = logs.map(l => `
+      <tr>
+        <td style="font-family:monospace;color:#64748b;font-size:12px">${l.timestamp}</td>
+        <td><span style="color:#38bdf8;font-weight:600">${l.username}</span></td>
+        <td>${l.status==='SUCCESS'
+          ? '<span class="badge badge-success">SUCCESS</span>'
+          : l.status==='FAILED'
+          ? '<span class="badge badge-danger">FAILED</span>'
+          : '<span class="badge badge-info">LOGOUT</span>'}</td>
+        <td style="font-family:monospace;color:#94a3b8">${l.ip_address}</td>
+        <td style="color:#64748b">${l.message}</td>
+      </tr>`).join('');
+
+    document.getElementById('alerts-div').innerHTML = alerts.length === 0
+      ? '<div style="color:#64748b;text-align:center;padding:30px">No alerts yet</div>'
+      : alerts.slice(0,5).map(a => `
+        <div style="padding:10px 12px;background:#0f172a;border-radius:8px;margin-bottom:8px;
+          border-left:3px solid ${a.severity==='CRITICAL'?'#c084fc':a.severity==='ERROR'?'#f87171':'#fb923c'}">
+          <div style="font-size:13px;color:#e2e8f0">${a.message.substring(0,90)}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:4px">${a.timestamp}</div>
+        </div>`).join('');
+  } catch(e) { console.log('refresh error', e); }
+}, 10000);
+</script>
+{% endblock %}

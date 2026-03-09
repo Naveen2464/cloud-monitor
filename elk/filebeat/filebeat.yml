@@ -1,0 +1,20 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /logs/app.log
+    fields:
+      log_type: app_log
+    fields_under_root: false
+  - type: log
+    enabled: true
+    paths:
+      - /logs/alerts.log
+    fields:
+      log_type: alerts_log
+    fields_under_root: false
+
+output.logstash:
+  hosts: ["logstash:5044"]
+
+logging.level: info

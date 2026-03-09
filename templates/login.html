@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Login - Cloud Monitor</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+body{background:#0f172a;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.box{background:#1e293b;border-radius:16px;padding:42px;width:430px;border:1px solid #334155;box-shadow:0 30px 60px rgba(0,0,0,0.6)}
+.logo{text-align:center;font-size:30px;font-weight:800;color:#38bdf8;margin-bottom:6px}
+.logo span{color:#f472b6}
+.sub{text-align:center;color:#64748b;font-size:13px;margin-bottom:32px}
+label{display:block;color:#94a3b8;font-size:12px;font-weight:700;margin-bottom:6px;margin-top:18px;text-transform:uppercase;letter-spacing:0.5px}
+input{width:100%;padding:12px 15px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:15px;outline:none;transition:border 0.2s}
+input:focus{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,0.1)}
+.btn{width:100%;padding:13px;background:linear-gradient(135deg,#0ea5e9,#6366f1);color:white;border:none;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;margin-top:26px;transition:opacity 0.2s}
+.btn:hover{opacity:0.9}
+.error{background:#450a0a;color:#f87171;padding:12px 15px;border-radius:8px;font-size:13px;margin-top:16px;border:1px solid #7f1d1d}
+.demo{margin-top:24px;background:#0f172a;border-radius:10px;padding:16px;border:1px solid #334155}
+.demo-title{color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.demo-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #1e293b;align-items:center}
+.demo-row:last-child{border:none;padding-bottom:0}
+.u{color:#38bdf8;font-weight:700;font-size:13px}
+.p{color:#34d399;font-size:13px;font-family:monospace}
+.r{font-size:11px;padding:2px 8px;border-radius:10px}
+.r-admin{background:#3b0764;color:#c084fc}
+.r-user{background:#0c4a6e;color:#38bdf8}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">Cloud<span>Monitor</span></div>
+  <div class="sub">Real-time Cloud Log Monitoring System</div>
+  <form method="POST" action="/login">
+    <label>Username</label>
+    <input type="text" name="username" placeholder="Enter your username" required autofocus autocomplete="off"/>
+    <label>Password</label>
+    <input type="password" name="password" placeholder="Enter your password" required/>
+    <button type="submit" class="btn">Sign In</button>
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  </form>
+  <div class="demo">
+    <div class="demo-title">Demo Accounts</div>
+    <div class="demo-row"><span class="u">alice</span><span class="p">password123</span><span class="r r-user">user</span></div>
+    <div class="demo-row"><span class="u">bob</span><span class="p">securepass</span><span class="r r-user">user</span></div>
+    <div class="demo-row"><span class="u">charlie</span><span class="p">mypassword</span><span class="r r-user">user</span></div>
+    <div class="demo-row"><span class="u">admin</span><span class="p">admin123</span><span class="r r-admin">admin</span></div>
+  </div>
+</div>
+</body>
+</html>
